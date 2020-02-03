@@ -2,10 +2,21 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>My Title</title>
+    
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    
+    <!-- Load external css -->
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <title>Temporary Climate</title>
   </head>
   <body>
-    <h1>My Webpage</h1>
+    <h1>Test Page</h1>
+      <!-- Create an element where the map will take place -->
+    <svg id="my_dataviz" width="800" height="600"></svg>
     <script src="./index.js"></script>
   </body>
 </html>
