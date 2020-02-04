@@ -1,11 +1,125 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>My Title</title>
-  </head>
-  <body>
-    <h1>My Webpage</h1>
-    <script src="./index.js"></script>
-  </body>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Climate Change</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/navbar.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon-32x32.png">
+  <style>
+    .countries {
+      fill: none;
+      stroke: #fff;
+      stroke-linejoin: round;
+    }
+    .legendThreshold {
+        font-size: 12px;
+        font-family: sans-serif;
+    }
+    .caption {
+        fill: #000;
+        text-anchor: start;
+        font-weight: bold;
+    }
+    h1, h2, h3,
+    h4, h5, h6 {
+        text-align: center;
+    }
+  </style>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+</head>
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="container" style="margin-top: 2vh">
+    <div class="row">
+      <div class="twelve columns">
+        <h3>Climate Change Charts (TODO: main title?)</h3>
+        <nav class="navbar">
+          <div class="container">
+            <ul class="navbar-list">
+              <li class="navbar-item"><a class="navbar-link" href="#overview">Overview</a></li>
+              <li class="navbar-item"><a class="navbar-link" href="#chart-root">Chart</a></li>
+              <li class="navbar-item"><a class="navbar-link" href="#map-root">Map</a></li>
+            </ul>
+          </div>
+        </nav>
+
+        <form id="search-form">
+          <div class="row">
+            <div class="six columns">
+              <!-- TODO: merge with country-dropdown -->
+              <label for="country-query">Search</label>
+              <input class="u-full-width" type="text" placeholder="USA" id="country-query" />
+            </div>
+            <div class="six columns">
+              <!-- TODO: merge with country-query -->
+              <label for="country-dropdown">Select</label>
+              <select class="u-full-width" id="country-dropdown">
+                <option value="country-0"></option>
+                <option value="country-1"></option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="offset-by-ten two columns">
+              <button class="button-primary" id="search-button">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- map and chart section -->
+    <div class="row">
+      <div class="twelve columns">
+        <div id='chart-root'></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="twelve columns">
+        <div id='map-root'></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UI related scripts -->
+  <script>
+    // disabling page refresh on submit
+    (function() {
+      var form = document.getElementById("search-form");
+      form.addEventListener('submit', (evnt) => {evnt.preventDefault();});
+    })();
+  </script>
+
+  <!-- import D3 visualization code -->
+  <script src="./visualization.js"></script>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
 </html>
