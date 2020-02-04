@@ -51,3 +51,9 @@ list of dependencies in `package.json`.
 
 _Note that if you install a library your teammates will need to install it too. Once the dep is added
 to `package.json` simply running `npm install` in this directory will download the new dependency._
+
+
+## Sources
+
+ * [Berkeley Earth](http://berkeleyearth.org/)
+ * [Country codes](https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/)
