@@ -8,7 +8,11 @@ import pandas as pd
 import os
 
 CATEGORIES = ['TAVG', 'TMAX', 'TMIN']
-DATA_DIR = 'data'
+DL_DIR = 'downloaded'
+PREP_DIR = 'prepared'
+CCODES_PATH = 'sources/country-regional-codes.csv'
+
+ccodes = None
 
 def is_number(s):
     """Checks if a string is a valid number"""
@@ -25,6 +29,7 @@ def parse_temp_data(path):
     Args:
         path: Path to raw data file (a text file).
     """
+    global ccodes
 
     TEMP_SEARCH = 'Estimated Jan 1951-Dec 1980 absolute temperature (C):'
     YEAR_COL = 0
@@ -44,6 +49,9 @@ def parse_temp_data(path):
         '10yr_temp', '10yr_unc',
         '20yr_temp', '20yr_unc',
     ]
+
+    if ccodes is None:
+        ccodes = pd.read_csv(CCODES_PATH, encoding='latin')
 
     rows = []
     base_temp = None
@@ -112,15 +120,17 @@ def parse_temp_data(path):
 
 def parse_category(cat):
     """
-    Parses a category of raw data files from `DATA_DIR`.
+    Parses a category of raw data files from `PREP_DIR`.
 
     Args:
         cat: Temperature data category (TAVG, TMAX, or TMIN).
     """
-    raw_txts = glob(os.path.join(DATA_DIR, '*-{}.txt'.format(cat)))
+    raw_txts = glob(os.path.join(DL_DIR, '*-{}.txt'.format(cat)))
+    if not os.path.exists(PREP_DIR):
+        os.mkdir(PREP_DIR)
     for i, path in enumerate(raw_txts):
         name = os.path.splitext(os.path.basename(path))[0]
-        output_path = os.path.join(DATA_DIR, '{}.csv'.format(name))
+        output_path = os.path.join(PREP_DIR, '{}.csv'.format(name))
         df = parse_temp_data(path)
         df.to_csv(output_path, index=False)
         if (i + 1) % 50 == 0:

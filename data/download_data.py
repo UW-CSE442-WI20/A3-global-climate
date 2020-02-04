@@ -10,8 +10,8 @@ import urllib.parse
 
 CATEGORIES = ['TAVG', 'TMAX', 'TMIN']
 BERK_URL = 'http://berkeleyearth.lbl.gov/auto/Regional/{}/Text/'
-CCODES_PATH = 'countries-20140629.csv'
-DATA_DIR = 'data'
+DL_DIR = 'downloaded'
+CCODES_PATH = 'sources/country-regional-codes.csv'
 
 def dl_category(cat, br, lookup=None):
     """
@@ -68,10 +68,10 @@ def dl_category(cat, br, lookup=None):
         region = ' '.join(region)
 
         # Search database for country name
-        rows = ccodes[ccodes['English Name'].str.match(region, case=False)]
+        rows = ccodes[ccodes['name'].str.match(region, case=False)]
         num_rows = len(rows.index)
         if num_rows == 1:
-            code = rows.Code.values.item()
+            code = rows['alpha-3'].values.item()
             valid_names.append((code, path))
         else:
             # Check lookup table for unknown country code.
@@ -82,10 +82,10 @@ def dl_category(cat, br, lookup=None):
                 code = lookup[key]
                 valid_names.append((code, path))
             elif num_rows > 1:
-                codes = rows.Code.values
+                codes = rows['alpha-3'].values
                 print('"{}" has multiple matches:'.format(region, ', '.join(codes)))
                 for i, c in enumerate(codes):
-                    cname = rows['English Name'].values[i]
+                    cname = rows['name'].values[i]
                     print('  ({}). {}, {}'.format(i, c, cname))
                 num = input('Enter a number (or nothing to skip): ')
                 if num.isdigit():
@@ -102,14 +102,14 @@ def dl_category(cat, br, lookup=None):
     print('{}/{} ({:.02f}%) of rows used'.format(len(valid_names), len(paths), per_rows))
 
     # Download data for each valid country
-    if not os.path.exists(DATA_DIR):
-        os.mkdir(DATA_DIR)
+    if not os.path.exists(DL_DIR):
+        os.mkdir(DL_DIR)
     for i, (code, name) in enumerate(valid_names):
         url = urllib.parse.urljoin(cat_url, name)
         br.open(url)
         resp = br.response()
 
-        out_path = os.path.join(DATA_DIR, '{}-{}.txt'.format(code, cat))
+        out_path = os.path.join(DL_DIR, '{}-{}.txt'.format(code, cat))
         if (i + 1) % 50 == 0:
             print('{}/{} files written'.format(i + 1, len(valid_names)))
         with open(out_path, 'wb') as f:
