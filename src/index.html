@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="css/skeleton.css">
   <link rel="stylesheet" href="css/navbar.css">
 
+
   <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <link rel="icon" type="image/png" href="images/favicon-32x32.png">
@@ -50,6 +51,7 @@
   <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
   <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+  <script src="https://unpkg.com/d3-simple-slider"></script>q
 </head>
 <body>
 
@@ -80,8 +82,6 @@
               <!-- TODO: merge with country-query -->
               <label for="country-dropdown">Select</label>
               <select class="u-full-width" id="country-dropdown">
-                <option value="country-0"></option>
-                <option value="country-1"></option>
               </select>
             </div>
           </div>
@@ -100,6 +100,12 @@
         <div id='chart-root'></div>
       </div>
     </div>
+
+    <div class="slider">
+      <div class="col-sm-2"><p id="value-time"></p></div>
+      <div class="col-sm"><div id="slider-time"></div></div>
+    </div>
+
     <div class="row">
       <div class="twelve columns">
         <div id='map-root'></div>
@@ -114,6 +120,20 @@
       var form = document.getElementById("search-form");
       form.addEventListener('submit', (evnt) => {evnt.preventDefault();});
     })();
+  </script>
+
+  <script> //country selector
+    d3.csv("data/countries.csv", function(data) {
+      var selector = d3.select("select")
+              .attr("id", "country-dropdown")
+              .selectAll("option")
+              .data(data)
+              .enter().append("option")
+              .text(function(d) { return d.name; })
+              .attr("value", function (d, i) {
+                return i;
+       });
+    })
   </script>
 
   <!-- import D3 visualization code -->
