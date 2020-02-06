@@ -1,0 +1,33 @@
+.countries {
+    fill: none;
+    stroke: white;
+    stroke-linejoin: round;
+}
+
+.legendThreshold {
+    font-size: 12px;
+    font-family: sans-serif;
+}
+
+.caption {
+    fill: black;
+    text-anchor: start;
+    font-weight: bold;
+}
+
+h1, h2, h3,
+h4, h5, h6 {
+    text-align: center;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 10px;
+    margin-top: -20px;
+    font: 10px sans-serif;
+    color: white;
+    background: rgba(43,43,43, 0.8);
+    border-radius: 2px;
+    pointer-events: none;
+  }
