@@ -2,19 +2,10 @@
 // **       LOAD DATA       **
 // ***************************
 
-//-36.3 to 30.3
-
-var colorScheme = d3.schemeReds[6];
-colorScheme.unshift("#eee")
-var colorScale = d3.scaleThreshold()
-    .domain([1, 6, 11, 16, 21, 26])
-    .range(colorScheme);
-var colorScale = d3.scaleLinear().domain([-36.3, 0, 30.3]).range(['#0000ff', 'white', 'red']);
-
 // ***************************
 // **     CHOROPLETH        **
 // ***************************
-(function () {
+function choropleth() {
     var margin = { top: 10, left: 10, right: 10, bottom: 10 },
         height = 600 - margin.top - margin.bottom,
         width = 960 - margin.left - margin.right;
@@ -28,6 +19,19 @@ var colorScale = d3.scaleLinear().domain([-36.3, 0, 30.3]).range(['#0000ff', 'wh
     var tooltip = d3.select('body')
         .append("div")
         .attr("class", "tooltip");
+
+    //-36.3 to 30.3
+    // Set color scale
+    var colorScale = d3.scaleLinear().domain([-36.3, 0, 30.3]).range(['#2c7fb8', 'white', '#de2d26']);
+
+    // Use color scale and undefined color to get color based on value
+    function getColor(val) {
+        if (val == undefined || val == "") {
+            return "black"
+        } else {
+            return colorScale(val);
+        }
+    }
 
     // specify map and projection
     var projection = d3.geoNaturalEarth()
@@ -66,6 +70,7 @@ var colorScale = d3.scaleLinear().domain([-36.3, 0, 30.3]).range(['#0000ff', 'wh
                 data.set(d.code, new Object());
             }
             var dict = data.get(d.code);
+            dict.name = d.name;
             dict[d.year] = d["1yr_temp"]
         })
         .await(ready);
@@ -86,10 +91,9 @@ var colorScale = d3.scaleLinear().domain([-36.3, 0, 30.3]).range(['#0000ff', 'wh
                     if (!d.years) {
                         d.years = {};
                     }
-                    d.cur_year = 2000
-                    var value = d.years[d.cur_year] || 0;
+                    d.cur_year = 2000;
                     // Set the color
-                    return colorScale(value);
+                    return getColor(d.years[d.cur_year]);
                 })
                 .attr("d", path)
                 .on("mouseover", mouseover)
@@ -120,21 +124,23 @@ var colorScale = d3.scaleLinear().domain([-36.3, 0, 30.3]).range(['#0000ff', 'wh
             .style("opacity", 1)
     }
 
-})();
+    // Change the year
+    function changeYear(year) {
+        d3.selectAll("path#country-path")
+            .attr("fill", (d) => {
+                d.cur_year = year;
+                console.log(d);
+                return getColor(d.years[year]);
+            })
+    }
 
-// Change the year
-function changeYear(year) {
-    d3.selectAll("path#country-path")
-        .attr("fill", (d) => {
-            d.cur_year = year;
-            var value = d.years[year];
-            if (value == undefined) {
-                return "black";
-            } else {
-                return colorScale(value);
-            }
-        })
+    return {
+        changeYear: changeYear
+    }
 }
+
+var map = choropleth();
+
 
 // **************************
 // **     LINE CHART       **
