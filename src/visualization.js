@@ -214,6 +214,7 @@ var map = choropleth();
         .default(new Date(1880, 10, 3))
         .on('onchange', val => {
              d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+             map.changeYear(d3.timeFormat('%Y')(val));
         });
 
     var gTime = d3
