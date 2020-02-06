@@ -200,8 +200,8 @@ var map = choropleth();
 // ** SLIDER AND DROPDOWN  **
 // **************************
 (function () {
-    var dataTime = d3.range(0, 10).map(function(d) {
-        return new Date(1995 + d, 10, 3);
+    var dataTime = d3.range(0, 270).map(function(d) {
+        return new Date(1744 + d, 10, 3);
     });
 
     var sliderTime = d3
@@ -211,11 +211,10 @@ var map = choropleth();
         .step(1000 * 60 * 60 * 24 * 365)
         .width(875)
         .tickFormat(d3.timeFormat('%Y'))
-        .tickValues(dataTime)
-        .default(new Date(1998, 10, 3))
-    // .on('onchange', val => {
-    //   d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
-    // });
+        .default(new Date(1880, 10, 3))
+        .on('onchange', val => {
+             d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+        });
 
     var gTime = d3
         .select('div#slider-time')
@@ -227,5 +226,5 @@ var map = choropleth();
 
     gTime.call(sliderTime);
 
-    // d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTime.value()));
+    d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTime.value()));
 }) ();
