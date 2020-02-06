@@ -36,7 +36,7 @@ To run the project locally, run `npm start` and it will be available at http://l
 Run `npm run build` and all of your assets will be compiled and placed into the `docs/` folder. Note
 that this command will overwrite the existing docs folder.
 
-Once pushed to GitHub, the output should be available at UW-CSE442-WI20.github.io/your-repo-name/
+Once pushed to GitHub, the output should be available at http://UW-CSE442-WI20.github.io/A3-global-climate/
 
 
 ## Other notes

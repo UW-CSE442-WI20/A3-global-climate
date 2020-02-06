@@ -9,15 +9,15 @@
         .attr("height", height + margin.top + margin.bottom)
         .attr("width", width + margin.left + margin.right);
 
-  // Map and projection
-  var path = d3.geoPath();
+ // specify map and projection
   var projection = d3.geoNaturalEarth()
       .scale(width / 2 / Math.PI)
       .translate([width / 2, height / 2])
+// create a geopath based on the chosen projection
   var path = d3.geoPath()
       .projection(projection);
 
-  // Data and color scale
+// define data map (loaded in later) and color scale
   var data = d3.map();
   var colorScheme = d3.schemeReds[6];
   colorScheme.unshift("#eee")
@@ -45,8 +45,10 @@
   // Load external data and boot
   // geojson topology: http://enjalot.github.io/wwsd/data/world/world-110m.geojson
   d3.queue()
-      .defer(d3.json, "./data/world-110m.geojson")
-      .defer(d3.csv, "./data/countries.csv", function(d) { data.set(d.code, +d.total); })
+      .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+      .defer(d3.csv, "data/countries.csv", function(d) { 
+        console.log(d)
+        data.set(d.code, +d.total); })
       .await(ready);
 
   function ready(error, topo) {
@@ -121,3 +123,34 @@
       )
     });
 })();
+
+(function () {
+    var dataTime = d3.range(0, 10).map(function(d) {
+        return new Date(1995 + d, 10, 3);
+    });
+
+    var sliderTime = d3
+        .sliderBottom()
+        .min(d3.min(dataTime))
+        .max(d3.max(dataTime))
+        .step(1000 * 60 * 60 * 24 * 365)
+        .width(875)
+        .tickFormat(d3.timeFormat('%Y'))
+        .tickValues(dataTime)
+        .default(new Date(1998, 10, 3))
+    // .on('onchange', val => {
+    //   d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+    // });
+
+    var gTime = d3
+        .select('div#slider-time')
+        .append('svg')
+        .attr('width', 1000)
+        .attr('height', 100)
+        .append('g')
+        .attr('transform', 'translate(30,30)');
+
+    gTime.call(sliderTime);
+
+    // d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTime.value()));
+}) ();
