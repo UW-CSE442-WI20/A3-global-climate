@@ -1,4 +1,17 @@
 // ***************************
+// **       LOAD DATA       **
+// ***************************
+
+//-36.3 to 30.3
+
+var colorScheme = d3.schemeReds[6];
+colorScheme.unshift("#eee")
+var colorScale = d3.scaleThreshold()
+    .domain([1, 6, 11, 16, 21, 26])
+    .range(colorScheme);
+var colorScale = d3.scaleLinear().domain([-36.3, 0, 30.3]).range(['#0000ff', 'white', 'red']);
+
+// ***************************
 // **     CHOROPLETH        **
 // ***************************
 (function () {
@@ -26,11 +39,6 @@
 
     // define data map (loaded in later) and color scale
     var data = d3.map();
-    var colorScheme = d3.schemeReds[6];
-    colorScheme.unshift("#eee")
-    var colorScale = d3.scaleThreshold()
-        .domain([1, 6, 11, 26, 101, 1001])
-        .range(colorScheme);
 
     // Legend
     var g = svg.append("g")
@@ -40,11 +48,11 @@
         .attr("class", "caption")
         .attr("x", 0)
         .attr("y", -6)
-        .text("Legend Title");
-    var labels = ['0', '1-5', '6-10', '11-25', '26-100', '101-1000', '> 1000'];
+        .text("Temperature Celsius");
     var legend = d3.legendColor()
-        .labels(function (d) { return labels[d.i]; })
-        .shapePadding(4)
+        .cells(8)
+        .shapeHeight(20)
+        .shapePadding(0)
         .scale(colorScale);
     svg.select(".legendThreshold")
         .call(legend);
@@ -53,8 +61,12 @@
     // geojson topology: http://enjalot.github.io/wwsd/data/world/world-110m.geojson
     d3.queue()
         .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
-        .defer(d3.csv, "data/countries.csv", function (d) {
-            data.set(d.code, +d.total);
+        .defer(d3.csv, "data/TAVG-all.csv", function (d) {
+            if (!data.has(d.code)) {
+                data.set(d.code, new Object());
+            }
+            var dict = data.get(d.code);
+            dict[d.year] = d["1yr_temp"]
         })
         .await(ready);
 
@@ -67,37 +79,62 @@
             .selectAll("path")
             .data(topo.features)
             .enter().append("path")
-            .attr("fill", function (d) {
-                // Pull data for this country
-                d.total = data.get(d.id) || 0;
-                // Set the color
-                return colorScale(d.total);
-            })
-            .attr("d", path)
-            .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
-            .on("mouseout", mouseout);
+                .attr("id", "country-path")
+                .attr("fill", function (d) {
+                    // Pull data for this country
+                    d.years = data.get(d.id);
+                    if (!d.years) {
+                        d.years = {};
+                    }
+                    d.cur_year = 2000
+                    var value = d.years[d.cur_year] || 0;
+                    // Set the color
+                    return colorScale(value);
+                })
+                .attr("d", path)
+                .on("mouseover", mouseover)
+                .on("mousemove", mousemove)
+                .on("mouseout", mouseout);
     }
 
-    // show
+    // show tooltip and highlight country
     function mouseover(d) {
         tooltip
             .style("display", "inline")
-            .text("Country: " + d.id + ", Total: " + d.total);
+            .text("Country: " + d.id + ", Temp: " + d.years[d.cur_year]);
         d3.select(this)
             .style("opacity", .5)
     }
+
+    //update location to follow cursor
     function mousemove() {
         tooltip
             .style("left", (d3.event.pageX - 20) + "px")
             .style("top", (d3.event.pageY - 12) + "px");
     }
+
+    //un-highlight country and hide tooltip
     function mouseout() {
         tooltip.style("display", "none");
         d3.select(this)
             .style("opacity", 1)
     }
+
 })();
+
+// Change the year
+function changeYear(year) {
+    d3.selectAll("path#country-path")
+        .attr("fill", (d) => {
+            d.cur_year = year;
+            var value = d.years[year];
+            if (value == undefined) {
+                return "black";
+            } else {
+                return colorScale(value);
+            }
+        })
+}
 
 // **************************
 // **     LINE CHART       **
