@@ -1,4 +1,4 @@
-name,code,year,1yr_temp,5yr_temp,10yr_temp,20yr_temp
+name,code,year,yr1_temp,yr5_temp,yr10_temp,yr20_temp
 Belize,BLZ,1853,19.03,,,
 Belize,BLZ,1854,18.991,18.991,,
 Belize,BLZ,1855,18.989,18.962,,

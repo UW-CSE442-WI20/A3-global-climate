@@ -21,13 +21,14 @@ def combine_temp_on_cat(cat):
         Merged temperature data as a pd.DataDrame. None if no files were found.
     """
     global ccodes
-    COLUMNS = ['year', '1yr_temp', '5yr_temp', '10yr_temp', '20yr_temp']
+    COLUMNS = ['year', 'yr1_temp', 'yr5_temp', 'yr10_temp', 'yr20_temp']
     NEW_COLUMNS = ['name', 'code', 'year',
-                   '1yr_temp', '5yr_temp',
-                   '10yr_temp', '20yr_temp']
+                   'yr1_temp', 'yr5_temp',
+                   'yr10_temp', 'yr20_temp']
 
     print('Merging temperature data for {}...'.format(cat))
-    raw_txts = glob(os.path.join(PREP_DIR, '*-{}.csv'.format(cat)))
+    read_dir = os.path.join(PREP_DIR, '{}-by-country'.format(cat))
+    raw_txts = glob(os.path.join(read_dir, '*-{}.csv'.format(cat)))
     if len(raw_txts) == 0:
         return None
 

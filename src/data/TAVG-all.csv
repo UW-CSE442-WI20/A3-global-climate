@@ -1,4 +1,4 @@
-name,code,year,1yr_temp,5yr_temp,10yr_temp,20yr_temp
+name,code,year,yr1_temp,yr5_temp,yr10_temp,yr20_temp
 "Taiwan, Province of China",TWN,1841,,,,
 "Taiwan, Province of China",TWN,1842,21.445999999999998,,,
 "Taiwan, Province of China",TWN,1843,21.482000000000006,21.336,,

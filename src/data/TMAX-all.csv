@@ -1,4 +1,4 @@
-name,code,year,1yr_temp,5yr_temp,10yr_temp,20yr_temp
+name,code,year,yr1_temp,yr5_temp,yr10_temp,yr20_temp
 Iraq,IRQ,1864,,,,
 Iraq,IRQ,1865,29.232,,,
 Iraq,IRQ,1866,28.799,,,
