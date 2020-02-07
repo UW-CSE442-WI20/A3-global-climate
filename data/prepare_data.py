@@ -44,10 +44,10 @@ def parse_temp_data(path):
     YR20_UNC_COL = 11
     COLUMNS = [
         'year',
-        '1yr_temp', '1yr_unc',
-        '5yr_temp', '5yr_unc',
-        '10yr_temp', '10yr_unc',
-        '20yr_temp', '20yr_unc',
+        'yr1_temp', 'yr1_unc',
+        'yr5_temp', 'yr5_unc',
+        'yr10_temp', 'yr10_unc',
+        'yr20_temp', 'yr20_unc'
     ]
 
     if ccodes is None:
@@ -126,11 +126,14 @@ def parse_category(cat):
         cat: Temperature data category (TAVG, TMAX, or TMIN).
     """
     raw_txts = glob(os.path.join(DL_DIR, '*-{}.txt'.format(cat)))
+    out_dir = os.path.join(PREP_DIR, '{}-by-country'.format(cat))
     if not os.path.exists(PREP_DIR):
         os.mkdir(PREP_DIR)
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
     for i, path in enumerate(raw_txts):
         name = os.path.splitext(os.path.basename(path))[0]
-        output_path = os.path.join(PREP_DIR, '{}.csv'.format(name))
+        output_path = os.path.join(out_dir, '{}.csv'.format(name))
         df = parse_temp_data(path)
         df.to_csv(output_path, index=False)
         if (i + 1) % 50 == 0:
