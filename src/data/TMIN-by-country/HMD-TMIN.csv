@@ -1,4 +1,4 @@
-year,1yr_temp,1yr_unc,5yr_temp,5yr_unc,10yr_temp,10yr_unc,20yr_temp,20yr_unc
+year,yr1_temp,yr1_unc,yr5_temp,yr5_unc,yr10_temp,yr10_unc,yr20_temp,yr20_unc
 1951,,,,,,,,
 1952,0.28500000000000003,2.021,,,,,,
 1953,0.259,1.995,0.32600000000000007,1.8860000000000001,,,,

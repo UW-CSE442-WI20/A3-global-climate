@@ -1,4 +1,4 @@
-year,1yr_temp,1yr_unc,5yr_temp,5yr_unc,10yr_temp,10yr_unc,20yr_temp,20yr_unc
+year,yr1_temp,yr1_unc,yr5_temp,yr5_unc,yr10_temp,yr10_unc,yr20_temp,yr20_unc
 1853,19.03,1.34,,,,,,
 1854,18.991,1.942,18.991,1.344,,,,
 1855,18.989,1.54,18.962,1.303,,,,
