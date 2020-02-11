@@ -33,7 +33,7 @@
   <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
   <script src="https://d3js.org/d3-scale.v3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
-  <script src="https://unpkg.com/d3-simple-slider"></script>q
+  <script src="https://unpkg.com/d3-simple-slider"></script>
 </head>
 <body>
 
@@ -84,8 +84,8 @@
     </div>
 
     <div class="slider">
-      <div class="col-sm-2"><p id="value-time"></p></div>
       <div class="col-sm"><div id="slider-time"></div></div>
+      <div class="col-sm-2"><p id="value-time"></p></div>
     </div>
 
     <div class="row">
@@ -97,7 +97,7 @@
 
   <!-- UI related scripts -->
   <script>
-    // disabling page refresh on submit
+    //disabling page refresh on submit
     (function() {
       var form = document.getElementById("search-form");
       form.addEventListener('submit', (evnt) => {evnt.preventDefault();});
@@ -107,13 +107,13 @@
   <script> //generate dropdown menu
     d3.csv("data/countries.csv", function(data) {
       var selector = d3.select("select")
-              .attr("id", "country-dropdown")
-              .selectAll("option")
-              .data(data)
-              .enter().append("option")
-              .text(function(d) { return d.name; })
-              .attr("value", function (d, i) {
-                return i;
+          .attr("id", "country-dropdown")
+          .selectAll("option")
+          .data(data)
+          .enter().append("option")
+          .text(function(d) { return d.name; })
+          .attr("value", function (d, i) {
+            return i;
        });
     })
   </script>

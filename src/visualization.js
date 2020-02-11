@@ -213,7 +213,7 @@ var map = choropleth();
         .tickFormat(d3.timeFormat('%Y'))
         .default(new Date(1880, 10, 3))
         .on('onchange', val => {
-             d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+             d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(val));
         });
 
     var gTime = d3
@@ -226,5 +226,5 @@ var map = choropleth();
 
     gTime.call(sliderTime);
 
-    d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTime.value()));
+    d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(sliderTime.value()));
 }) ();
