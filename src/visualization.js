@@ -57,12 +57,13 @@ function choropleth() {
     svg.select(".legendThreshold")
         .call(legend);
 
+    const geoData = require("./data/world-110m.geojson")
     const tavgData = require("./data/TAVG-all.csv")
 
     // Load external data and boot
     // geojson topology: http://enjalot.github.io/wwsd/data/world/world-110m.geojson
     d3.queue()
-        .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+        .defer(d3.json, geoData)
         .defer(d3.csv, tavgData, function (d) {
             if (!data.has(d.code)) {
                 data.set(d.code, new Object());
