@@ -31,3 +31,14 @@ h4, h5, h6 {
     border-radius: 2px;
     pointer-events: none;
   }
+
+.slider {
+    width: 800px;
+    float: left;
+}
+
+#play-button {
+    float: right;
+    margin-right: 20px;
+    margin-top: 20px;
+}
