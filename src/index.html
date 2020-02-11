@@ -104,19 +104,8 @@
     })();
   </script>
 
-  <script> //generate dropdown menu
-    d3.csv("data/countries.csv", function(data) {
-      var selector = d3.select("select")
-              .attr("id", "country-dropdown")
-              .selectAll("option")
-              .data(data)
-              .enter().append("option")
-              .text(function(d) { return d.name; })
-              .attr("value", function (d, i) {
-                return i;
-       });
-    })
-  </script>
+  <!-- populate country selection -->
+  <script src = ./country-select.js></script>
 
   <!-- import D3 visualization code -->
   <script src="./visualization.js"></script>
