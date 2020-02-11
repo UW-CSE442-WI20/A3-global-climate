@@ -202,6 +202,11 @@ var map = choropleth();
 // ** SLIDER AND DROPDOWN  **
 // **************************
 (function () {
+
+    var current = new Date(1744, 10, 3);;
+    var target = new Date(2013, 10, 3);
+    var playButton = d3.select("#play-button");
+
     var dataTime = d3.range(0, 270).map(function(d) {
         return new Date(1744 + d, 10, 3);
     });
@@ -211,11 +216,12 @@ var map = choropleth();
         .min(d3.min(dataTime))
         .max(d3.max(dataTime))
         .step(1000 * 60 * 60 * 24 * 365)
-        .width(875)
+        .width(765)
         .tickFormat(d3.timeFormat('%Y'))
-        .default(new Date(1880, 10, 3))
+        .default(new Date(1860, 10, 3))
         .on('onchange', val => {
-             d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+            current = val;
+             d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(val));
              map.changeYear(d3.timeFormat('%Y')(val));
         });
 
@@ -229,5 +235,25 @@ var map = choropleth();
 
     gTime.call(sliderTime);
 
-    d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTime.value()));
+    playButton.on("click", function() {
+        var button = d3.select(this);
+        if (button.text() == "Pause") {
+            clearInterval(timer);
+            button.text("Play");
+        } else {
+            timer = setInterval(step, 100);
+            button.text("Pause");
+        }
+    });
+
+    function step(){
+        current = sliderTime.value().setFullYear(sliderTime.value().getFullYear() + 1);
+        sliderTime.value(current);
+        if(sliderTime.value().getTime() > target.getTime()){
+            clearInterval(timer);
+            playButton.text("Play");
+        }
+    }
+
+    d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(sliderTime.value())).attr("align", "center");
 }) ();
