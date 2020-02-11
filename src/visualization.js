@@ -1,3 +1,6 @@
+var testing_temp;
+
+
 (function () {
   var margin = { top: 10, left: 10, right: 10, bottom: 10 },
       height = 600 - margin.top - margin.bottom,
@@ -47,7 +50,7 @@
   d3.queue()
       .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
       .defer(d3.csv, "data/countries.csv", function(d) { 
-        console.log(d)
+        // console.log(d)
         data.set(d.code, +d.total); })
       .await(ready);
 
@@ -85,28 +88,39 @@
       .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-  //Read the data
-  d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
-
+  // Read the data
+  d3.csv("/data/TAVG-by-country/AGO-TAVG.csv",
     // When reading the csv, I must format variables:
-    function(d){
-      return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
+    function(d){ 
+      return {
+        year : +d.year,
+        yr1_temp : +d.yr1_temp, yr1_unc : +d.yr1_unc,
+        yr5_temp : +d.yr5_temp, yr5_unc : +d.yr5_unc,
+        yr10_temp : +d.yr10_temp, yr10_unc : +d.yr10_unc,
+        yr20_temp : +d.yr20_temp, yr20_unc : +d.yr20_unc
+      }
     },
 
     // Now I can use this dataset:
     function(data) {
-
+      //var formatxAxis = d3.format('.0f');
+      // console.log(data);
       // Add X axis --> it is a date format
-      var x = d3.scaleTime()
-        .domain(d3.extent(data, function(d) { return d.date; }))
+      var x = d3.scaleLinear()
+        .domain(d3.extent(data, function(d) { 
+          // console.log(parseInt(d.year.toString().replace(/\,/g,'')));
+          // var a = d.year.toString();
+          console.log(+d.year);
+          return +d.year; }))
         .range([ 0, width ]);
       svg.append("g")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+        ;
 
       // Add Y axis
       var y = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) { return +d.value; })])
+        .domain([0, d3.max(data, function(d) { return +d.yr1_temp; })])
         .range([ height, 0 ]);
       svg.append("g")
         .call(d3.axisLeft(y));
@@ -118,8 +132,9 @@
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1.5)
         .attr("d", d3.line()
-          .x(function(d) { return x(d.date) })
-          .y(function(d) { return y(d.value) })
+          .defined((d) => d.yr1_temp != undefined)
+          .x(function(d) { return x(+d.year) })
+          .y(function(d) { return y(+d.yr1_temp) })
       )
     });
 })();
@@ -153,4 +168,4 @@
     gTime.call(sliderTime);
 
     // d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTime.value()));
-}) ();
+})();
