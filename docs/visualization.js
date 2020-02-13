@@ -1,9 +1,26 @@
+d3.csv("data/country_codes.csv", function(data) {
+    var selector = d3.select("select")
+        .attr("id", "country-dropdown")
+        .selectAll("option")
+        .data(data)
+        .enter().append("option")
+        .text(function(d) { return d.name; })
+        .attr("value", function (d, i) {
+          return d.code;
+     });
+  })
+
+function changeDropdown(code) {
+    d3.select("#country-dropdown")
+        .property("value", code);
+}
+
 // ***************************
 // **     CHOROPLETH        **
 // ***************************
 function choropleth() {
     var margin = { top: 10, left: 10, right: 10, bottom: 10 },
-        height = 600 - margin.top - margin.bottom,
+        height = 450 - margin.top - margin.bottom,
         width = 960 - margin.left - margin.right;
 
     // The svg
@@ -87,21 +104,23 @@ function choropleth() {
                     if (!d.years) {
                         d.years = {};
                     }
-                    d.cur_year = 2000;
+                    d.cur_year = 1890;
                     // Set the color
                     return getColor(d.years[d.cur_year]);
                 })
                 .attr("d", path)
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
-                .on("mouseout", mouseout);
+                .on("mouseout", mouseout)
+                .on("click", (d) => { changeDropdown(d.id); chart.redraw(d.id); });
     }
 
     // show tooltip and highlight country
     function mouseover(d) {
+        var formatDecimal2 = d3.format(".2f");
         tooltip
             .style("display", "inline")
-            .text("Country: " + d.id + ", Temp: " + d.years[d.cur_year]);
+            .text(d.properties.name + ": " + formatDecimal2(d.years[d.cur_year]) + " \u00B0C")
         d3.select(this)
             .style("opacity", .5)
     }
@@ -125,7 +144,7 @@ function choropleth() {
         d3.selectAll("path#country-path")
             .attr("fill", (d) => {
                 d.cur_year = year;
-                console.log(d);
+                // console.log(d);
                 return getColor(d.years[year]);
             })
     }
@@ -137,71 +156,152 @@ function choropleth() {
 
 var map = choropleth();
 
-
 // **************************
 // **     LINE CHART       **
 // **************************
-(function () {
-    // set the dimensions and margins of the graph
+function lineChart() {
+    // set dimensions and margins
     var margin = { top: 50, right: 50, bottom: 50, left: 50 },
         height = 300 - margin.top - margin.bottom,
         width = 960 - margin.left - margin.right;
 
-    // append the svg object to the body of the page
+     // append the svg object to the body of the page
     var svg = d3.select("#chart-root")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    //Read the data
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+    // define x scale and create x axis
+    var x = d3.scaleLinear()
+        //.domain(d3.extent(data, function(d) { return +d.year; }))
+        .range([0, width]);
 
-        // When reading the csv, I must format variables:
-        function (d) {
-            return { date: d3.timeParse("%Y-%m-%d")(d.date), value: d.value }
-        },
+    // define y scale and create y axis
+    var y = d3.scaleLinear()
+        //.domain([0, d3.max(data, function(d) { return +d.yr1_temp; })])
+        .range([height, 0]);
 
-        // Now I can use this dataset:
-        function (data) {
+    var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-            // Add X axis --> it is a date format
-            var x = d3.scaleTime()
-                .domain(d3.extent(data, function (d) { return d.date; }))
-                .range([0, width]);
-            svg.append("g")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x));
+    var line = d3.line()
+        //.interpolate("basis")
+        .defined((d) => !isNaN(d.temp))
+        .x((d) => x(d.year))
+        .y((d) => y(d.temp));
 
-            // Add Y axis
-            var y = d3.scaleLinear()
-                .domain([0, d3.max(data, function (d) { return +d.value; })])
-                .range([height, 0]);
-            svg.append("g")
+    var areaUnc = d3.area()
+        .defined((d) => !isNaN(d.unc))
+        .x((d) => x(d.year))
+        .y0((d) => y(d.temp - d.unc))
+        .y1((d) => y(d.temp + d.unc));
+
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .attr("class", "x");
+
+    svg.append("g")
+        .attr("class", "y");
+
+    function redraw(code) {
+        d3.csv("data/TAVG-by-country/" + code + "-TAVG.csv", (error, data) => {
+            if (error) throw error;
+    
+            // create color domain from data columns other than year
+            color.domain(['yr1_temp', 'yr5_temp']);
+    
+            var temperatures = color.domain().map((col) => {
+                return {
+                    period: col,
+                    values: data.map((d) => {
+                        return {
+                            year: d.year, 
+                            temp: parseFloat(d[col]),
+                            unc: parseFloat(d[col.slice(0, -4) + "unc"])
+                        };
+                    })
+                };
+            });
+    
+            x.domain([1750, 2013]);
+            
+            y.domain([
+                d3.min(temperatures, (c) => d3.min(c.values, (v) => {if (c.period == "yr1_temp") return v.temp; else return v.temp - v.unc})),
+                d3.max(temperatures, (c) => d3.max(c.values, (v) => {if (c.period == "yr1_temp") return v.temp; else return v.temp + v.unc}))
+            ]);
+    
+            svg.select("g.x")
+                .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    
+            svg.select("g.y")
                 .call(d3.axisLeft(y));
-
-            // Add the line
-            svg.append("path")
-                .datum(data)
-                .attr("fill", "none")
-                .attr("stroke", "steelblue")
-                .attr("stroke-width", 1.5)
-                .attr("d", d3.line()
-                    .x(function (d) { return x(d.date) })
-                    .y(function (d) { return y(d.value) })
-                )
+    
+            svg.selectAll(".temperature").remove();
+            var temperature = svg.selectAll(".temperature")
+                .data(temperatures)
+                .enter()
+                .append("g")
+                .attr("class", "temperature");
+    
+            temperature.append("path")
+                .attr("class", (d) => "area " + d.period + "_unc")
+                .attr("d", (d) => {if (d.period !== "yr1_temp") return areaUnc(d.values)})
+                .style("fill", (d) => color(d.period));
+    
+            temperature.append("path")
+                .attr("class", (d) => "line " + d.period)
+                .attr("d", (d) => line(d.values))
+                .style("stroke", (d) => color(d.period));
         });
-})();
+    }
+
+    svg.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height - 6)
+    .text("Year");
+
+  svg.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 6)
+    .attr("dy", "-3em")
+    .attr("transform", "rotate(-90)")
+    .text("Average Temperature (\xB0C)");
+  
+    svg.append("circle").attr("cx",15).attr("cy",10).attr("r", 6).style("fill", "rgb(31, 119, 180)")
+    svg.append("circle").attr("cx",15).attr("cy",30).attr("r", 6).style("fill", "rgb(255, 127, 14)")
+    svg.append("text").attr("x", 25).attr("y", 10).text("1-yr average").style("font-size", "14px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 25).attr("y", 30).text("5-yr average").style("font-size", "14px").attr("alignment-baseline","middle")
+
+    d3.select("#country-dropdown")
+        .on("change", function(d) { 
+            chart.redraw(this.value); 
+        });
+
+    redraw("AGO");
+    return {
+        redraw: redraw
+    }
+};
+
+var chart = lineChart();
 
 
-// **************************
-// ** SLIDER AND DROPDOWN  **
-// **************************
+
+// **********************
+// ** SLIDER AND PLAY  **
+// **********************
 (function () {
-    var dataTime = d3.range(0, 270).map(function(d) {
-        return new Date(1744 + d, 10, 3);
+
+    var current = new Date(1750, 10, 3);;
+    var target = new Date(2013, 10, 3);
+    var playButton = d3.select("#play-button");
+
+    var dataTime = d3.range(0, 264).map(function(d) {
+        return new Date(1750 + d, 10, 3);
     });
 
     var sliderTime = d3
@@ -209,11 +309,12 @@ var map = choropleth();
         .min(d3.min(dataTime))
         .max(d3.max(dataTime))
         .step(1000 * 60 * 60 * 24 * 365)
-        .width(875)
+        .width(765)
         .tickFormat(d3.timeFormat('%Y'))
-        .default(new Date(1880, 10, 3))
+        .default(new Date(1890, 10, 3))
         .on('onchange', val => {
-             d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+            current = val;
+             d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(val));
              map.changeYear(d3.timeFormat('%Y')(val));
         });
 
@@ -227,5 +328,25 @@ var map = choropleth();
 
     gTime.call(sliderTime);
 
-    d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTime.value()));
+    playButton.on("click", function() {
+        var button = d3.select(this);
+        if (button.text() == "Pause") {
+            clearInterval(timer);
+            button.text("Play");
+        } else {
+            timer = setInterval(step, 100);
+            button.text("Pause");
+        }
+    });
+
+    function step(){
+        current = sliderTime.value().setFullYear(sliderTime.value().getFullYear() + 1);
+        sliderTime.value(current);
+        if(sliderTime.value().getTime() > target.getTime()){
+            clearInterval(timer);
+            playButton.text("Play");
+        }
+    }
+
+    d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(sliderTime.value())).attr("align", "center");
 }) ();
