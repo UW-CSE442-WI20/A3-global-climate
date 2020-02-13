@@ -42,3 +42,16 @@ h4, h5, h6 {
     margin-right: 20px;
     margin-top: 20px;
 }
+
+.line {
+    fill: none;
+    stroke-width: 1;
+}
+
+.line:hover {
+    stroke-width: 3;
+}
+
+.yr1_temp {
+    stroke: blue;
+}
