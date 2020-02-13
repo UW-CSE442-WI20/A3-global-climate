@@ -1,3 +1,20 @@
+d3.csv("data/country_codes.csv", function(data) {
+    var selector = d3.select("select")
+        .attr("id", "country-dropdown")
+        .selectAll("option")
+        .data(data)
+        .enter().append("option")
+        .text(function(d) { return d.name; })
+        .attr("value", function (d, i) {
+          return d.code;
+     });
+  })
+
+function changeDropdown(code) {
+    d3.select("#country-dropdown")
+        .property("value", code);
+}
+
 // ***************************
 // **     CHOROPLETH        **
 // ***************************
@@ -95,7 +112,7 @@ function choropleth() {
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseout", mouseout)
-                .on("click", (d) => { chart.redraw(d.id) });
+                .on("click", (d) => { changeDropdown(d.id); chart.redraw(d.id); });
     }
 
     // show tooltip and highlight country
@@ -209,8 +226,8 @@ function lineChart() {
             x.domain([1750, 2013]);
             
             y.domain([
-                d3.min(temperatures, (c) => d3.min(c.values, (v) => v.temp - v.unc)),
-                d3.max(temperatures, (c) => d3.max(c.values, (v) => v.temp + v.unc))
+                d3.min(temperatures, (c) => d3.min(c.values, (v) => {if (c.period == "yr1_temp") return v.temp; else return v.temp - v.unc})),
+                d3.max(temperatures, (c) => d3.max(c.values, (v) => {if (c.period == "yr1_temp") return v.temp; else return v.temp + v.unc}))
             ]);
     
             svg.select("g.x")
@@ -238,6 +255,11 @@ function lineChart() {
         });
     }
 
+    d3.select("#country-dropdown")
+        .on("change", function(d) { 
+            chart.redraw(this.value); 
+        });
+
     redraw("AGO");
     return {
         redraw: redraw
@@ -245,6 +267,8 @@ function lineChart() {
 };
 
 var chart = lineChart();
+
+
 
 // **************************
 // ** SLIDER AND DROPDOWN  **
