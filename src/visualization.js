@@ -120,7 +120,7 @@ function choropleth() {
         var formatDecimal2 = d3.format(".2f");
         tooltip
             .style("display", "inline")
-            .text("Country: "+ d.id + ", Temp: " + formatDecimal2(d.years[d.cur_year]) + " \u00B0C")
+            .text(d.properties.name + ": " + formatDecimal2(d.years[d.cur_year]) + " \u00B0C")
         d3.select(this)
             .style("opacity", .5)
     }
