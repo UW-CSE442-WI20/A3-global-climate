@@ -23,6 +23,8 @@ function choropleth() {
         height = 450 - margin.top - margin.bottom,
         width = 960 - margin.left - margin.right;
 
+    var cur_country;
+
     // The svg
     var svg = d3.select("#map-root")
         .append("svg")
@@ -118,6 +120,7 @@ function choropleth() {
     // show tooltip and highlight country
     function mouseover(d) {
         var formatDecimal2 = d3.format(".2f");
+        cur_country = d;
         tooltip
             .style("display", "inline")
             .text(d.properties.name + ": " + formatDecimal2(d.years[d.cur_year]) + " \u00B0C")
@@ -141,12 +144,16 @@ function choropleth() {
 
     // Change the year
     function changeYear(year) {
+        var formatDecimal2 = d3.format(".2f");
         d3.selectAll("path#country-path")
             .attr("fill", (d) => {
                 d.cur_year = year;
                 // console.log(d);
                 return getColor(d.years[year]);
             })
+        tooltip
+            .text(cur_country.properties.name + ": " + 
+                formatDecimal2(cur_country.years[cur_country.cur_year]) + " \u00B0C")
     }
 
     return {
