@@ -178,6 +178,17 @@ function lineChart() {
         .y0((d) => y(d.temp - d.unc))
         .y1((d) => y(d.temp + d.unc));
 
+    var temperature = svg
+        .append("g")
+        .attr("class", "temperature");
+
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .attr("class", "x");
+
+    svg.append("g")
+        .attr("class", "y");
+
     function redraw(code) {
         d3.csv("data/TAVG-by-country/" + code + "-TAVG.csv", (error, data) => {
             if (error) throw error;
@@ -205,32 +216,16 @@ function lineChart() {
                 d3.max(temperatures, (c) => d3.max(c.values, (v) => v.temp + v.unc))
             ]);
     
-            svg.append("g")
-                .attr("transform", "translate(0," + height + ")")
+            svg.select("g.x")
                 .call(d3.axisBottom(x).tickFormat(d3.format("d")));
     
-            svg.append("g")
+            svg.select("g.y")
                 .call(d3.axisLeft(y));
     
-     /*       svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis);
-    
-            svg.append("g")
-                .attr("class", "y axis")
-                .call(yAxis)
-                .append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 6)
-                .attr("dy", ".71em")
-                .style("text-anchor", "end")
-                .text("Frequenza (tf-idf)"); */
-    
-            var temperature = svg.selectAll(".temperature")
+            temperature = svg.selectAll(".temperature")
                 .data(temperatures)
-                .enter().append("g")
-                .attr("class", "temperature");
+
+            temperature.selectAll("path").remove();
     
             temperature.append("path")
                 .attr("class", (d) => "area " + d.period + "_unc")
@@ -241,25 +236,16 @@ function lineChart() {
                 .attr("class", (d) => "line " + d.period)
                 .attr("d", (d) => line(d.values))
                 .style("stroke", (d) => color(d.period));
-    
-    
-            /*temperature.append("text")
-                .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-                .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temp) + ")"; })
-                .attr("x", 3)
-                .attr("dy", ".35em")
-                .text(function(d) { return d.name; });*/
         });
     }
 
+    redraw("AGO");
     return {
         redraw: redraw
     }
 };
 
 var chart = lineChart();
-
-chart.redraw("AGO");
 
 // **************************
 // ** SLIDER AND DROPDOWN  **
