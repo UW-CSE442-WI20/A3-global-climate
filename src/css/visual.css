@@ -48,10 +48,10 @@ h4, h5, h6 {
     stroke-width: 1;
 }
 
-.line:hover {
-    stroke-width: 3;
+.area {
+    opacity: .2;
 }
 
-.yr1_temp {
-    stroke: blue;
+.yr5_temp {
+    stroke-width: 3;
 }
