@@ -201,12 +201,12 @@ var map = choropleth();
 // **************************
 (function () {
 
-    var current = new Date(1744, 10, 3);;
+    var current = new Date(1750, 10, 3);;
     var target = new Date(2013, 10, 3);
     var playButton = d3.select("#play-button");
 
-    var dataTime = d3.range(0, 270).map(function(d) {
-        return new Date(1744 + d, 10, 3);
+    var dataTime = d3.range(0, 264).map(function(d) {
+        return new Date(1750 + d, 10, 3);
     });
 
     var sliderTime = d3
