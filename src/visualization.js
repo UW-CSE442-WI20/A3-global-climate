@@ -137,78 +137,10 @@ function choropleth() {
 
 var map = choropleth();
 
-
 // **************************
 // **     LINE CHART       **
 // **************************
-/*
-(function () {
-    // set the dimensions and margins of the graph
-    var margin = { top: 50, right: 50, bottom: 50, left: 50 },
-        height = 300 - margin.top - margin.bottom,
-        width = 960 - margin.left - margin.right;
-
-    // append the svg object to the body of the page
-    var svg = d3.select("#chart-root")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
-
-  // Read the data
-  d3.csv("data/TAVG-by-country/AGO-TAVG.csv",
-    // When reading the csv, I must format variables:
-    function(d){ 
-
-      return {
-        year : parseFloat(d.year),
-        yr1_temp : parseFloat(d.yr1_temp), yr1_unc : parseFloat(d.yr1_unc),
-        yr5_temp : parseFloat(d.yr5_temp), yr5_unc : +parseFloat(d.yr5_unc),
-        yr10_temp : parseFloat(d.yr10_temp), yr10_unc : +parseFloat(d.yr10_unc),
-        yr20_temp : parseFloat(d.yr20_temp), yr20_unc : +parseFloat(d.yr20_unc)
-      }
-    },
-
-    // Now I can use this dataset:
-    function(data) {
-      // Add X axis --> it is a date format
-      var x = d3.scaleLinear()
-        .domain(d3.extent(data, function(d) { 
-          // console.log(+d.year);
-          return +d.year; }))
-        .range([ 0, width ]);
-      svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).tickFormat(d3.format("d")))
-        ;
-
-      // Add Y axis
-      var y = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) { return +d.yr1_temp; })])
-        .range([ height, 0 ]);
-      svg.append("g")
-        .call(d3.axisLeft(y));
-
-      // Add the line
-      svg.append("path")
-        .datum(data)
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 1.5)
-        .attr("d", d3.line()
-          .defined((d) => !isNaN(d.yr1_temp))
-          .x(function(d) { return x(+d.year) })
-          .y(function(d) { return y(+d.yr1_temp) })
-      )
-    });
-})(); */
-
-// **************************
-// **     LINE CHART 2     **
-// **************************
-(function () {
+function lineChart() {
     // set dimensions and margins
     var margin = { top: 50, right: 50, bottom: 50, left: 50 },
         height = 300 - margin.top - margin.bottom,
@@ -237,75 +169,97 @@ var map = choropleth();
     var line = d3.line()
         //.interpolate("basis")
         .defined((d) => !isNaN(d.temp))
-        .x(function(d) { return x(+d.year) })
-        .y(function(d) { return y(+d.temp) });
+        .x((d) => x(d.year))
+        .y((d) => y(d.temp));
 
-    d3.csv("data/TAVG-by-country/AGO-TAVG.csv", function(error, data) {
-        if (error) throw error;
+    var areaUnc = d3.area()
+        .defined((d) => !isNaN(d.unc))
+        .x((d) => x(d.year))
+        .y0((d) => y(d.temp - d.unc))
+        .y1((d) => y(d.temp + d.unc));
 
-        // create color domain from data columns other than year
-        color.domain(d3.keys(data[0]).filter(function(key) { return key == "yr1_temp" && !key.endsWith("unc"); }));
-
-        var temperatures = color.domain().map(function(col) {
-            return {
-                period: col,
-                values: data.map(function(d) {
-                    return {year: d.year, temp: parseFloat(d[col])};
-                    }),
-                unc: data.map(function(d) {
-                    return {year: d.year, temp: parseFloat(d[col + "_unc"])}
+    function redraw(code) {
+        d3.csv("data/TAVG-by-country/" + code + "-TAVG.csv", (error, data) => {
+            if (error) throw error;
+    
+            // create color domain from data columns other than year
+            color.domain(d3.keys(data[0]).filter((key) => key == "yr5_temp" && !key.endsWith("_unc")));
+    
+            var temperatures = color.domain().map((col) => {
+                return {
+                    period: col,
+                    values: data.map((d) => {
+                        return {
+                            year: d.year, 
+                            temp: parseFloat(d[col]),
+                            unc: parseFloat(d[col.slice(0, -4) + "unc"])
+                        };
                     })
-            };
+                };
+            });
+    
+            x.domain(d3.extent(data, (d) => d.year));
+            
+            y.domain([
+                d3.min(temperatures, (c) => d3.min(c.values, (v) => v.temp - v.unc)),
+                d3.max(temperatures, (c) => d3.max(c.values, (v) => v.temp + v.unc))
+            ]);
+    
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    
+            svg.append("g")
+                .call(d3.axisLeft(y));
+    
+     /*       svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+    
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Frequenza (tf-idf)"); */
+    
+            var temperature = svg.selectAll(".temperature")
+                .data(temperatures)
+                .enter().append("g")
+                .attr("class", "temperature");
+    
+            temperature.append("path")
+                .attr("class", (d) => "area " + d.period + "_unc")
+                .attr("d", (d) => areaUnc(d.values))
+                .style("fill", (d) => color(d.period));
+    
+            temperature.append("path")
+                .attr("class", (d) => "line " + d.period)
+                .attr("d", (d) => line(d.values))
+                .style("stroke", (d) => color(d.period));
+    
+    
+            /*temperature.append("text")
+                .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+                .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temp) + ")"; })
+                .attr("x", 3)
+                .attr("dy", ".35em")
+                .text(function(d) { return d.name; });*/
         });
+    }
 
-        x.domain(d3.extent(data, function(d) { return d.year; }));
-        
-        y.domain([
-            d3.min(temperatures, function(c) { return d3.min(c.values, function(v) { return v.temp; }); }),
-            d3.max(temperatures, function(c) { return d3.max(c.values, function(v) { return v.temp; }); })
-        ]);
+    return {
+        redraw: redraw
+    }
+};
 
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+var chart = lineChart();
 
-        svg.append("g")
-            .call(d3.axisLeft(y));
-
- /*       svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("Frequenza (tf-idf)"); */
-
-        var temperature = svg.selectAll(".temperature")
-            .data(temperatures)
-            .enter().append("g")
-            .attr("class", "temperature");
-
-        temperature.append("path")
-            .attr("class", function(d) { return "line " + d.period })
-            .attr("d", function(d) { return line(d.values); })
-            .style("stroke", function(d) { return color(d.period); });
-
-        /*temperature.append("text")
-            .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-            .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temp) + ")"; })
-            .attr("x", 3)
-            .attr("dy", ".35em")
-            .text(function(d) { return d.name; });*/
-        });
-})();
-
+chart.redraw("AGO");
 
 // **************************
 // ** SLIDER AND DROPDOWN  **
