@@ -179,10 +179,6 @@ function lineChart() {
         .y0((d) => y(d.temp - d.unc))
         .y1((d) => y(d.temp + d.unc));
 
-    var temperature = svg
-        .append("g")
-        .attr("class", "temperature");
-
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .attr("class", "x");
@@ -195,7 +191,7 @@ function lineChart() {
             if (error) throw error;
     
             // create color domain from data columns other than year
-            color.domain(['yr5_temp']);
+            color.domain(['yr1_temp', 'yr5_temp']);
     
             var temperatures = color.domain().map((col) => {
                 return {
@@ -223,14 +219,16 @@ function lineChart() {
             svg.select("g.y")
                 .call(d3.axisLeft(y));
     
-            temperature = svg.selectAll(".temperature")
+            svg.selectAll(".temperature").remove();
+            var temperature = svg.selectAll(".temperature")
                 .data(temperatures)
-
-            temperature.selectAll("path").remove();
+                .enter()
+                .append("g")
+                .attr("class", "temperature");
     
             temperature.append("path")
                 .attr("class", (d) => "area " + d.period + "_unc")
-                .attr("d", (d) => areaUnc(d.values))
+                .attr("d", (d) => {if (d.period !== "yr1_temp") return areaUnc(d.values)})
                 .style("fill", (d) => color(d.period));
     
             temperature.append("path")
