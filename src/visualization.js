@@ -201,6 +201,23 @@ var map = choropleth();
           .x(function(d) { return x(+d.year) })
           .y(function(d) { return y(+d.yr1_temp) })
       )
+
+      svg.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "end")
+          .attr("x", width)
+          .attr("y", height - 6)
+          .text("Year");
+
+        svg.append("text")
+        .attr("class", "y label")
+        .attr("text-anchor", "end")
+        .attr("x", 30)
+        .attr("y", 6)
+        .attr("dy", "-3em")
+        .attr("transform", "rotate(-90)")
+        .text("Average Temperature (\xB0C)");
+
     });
 })();
 
