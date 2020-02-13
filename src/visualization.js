@@ -20,7 +20,7 @@ function changeDropdown(code) {
 // ***************************
 function choropleth() {
     var margin = { top: 10, left: 10, right: 10, bottom: 10 },
-        height = 600 - margin.top - margin.bottom,
+        height = 450 - margin.top - margin.bottom,
         width = 960 - margin.left - margin.right;
 
     // The svg
@@ -104,7 +104,7 @@ function choropleth() {
                     if (!d.years) {
                         d.years = {};
                     }
-                    d.cur_year = 2000;
+                    d.cur_year = 1890;
                     // Set the color
                     return getColor(d.years[d.cur_year]);
                 })
@@ -117,9 +117,10 @@ function choropleth() {
 
     // show tooltip and highlight country
     function mouseover(d) {
+        var formatDecimal2 = d3.format(".2f");
         tooltip
             .style("display", "inline")
-            .text("Country: " + d.id + ", Temp: " + d.years[d.cur_year]);
+            .text("Country: "+ d.id + ", Temp: " + formatDecimal2(d.years[d.cur_year]) + " \u00B0C")
         d3.select(this)
             .style("opacity", .5)
     }
@@ -290,17 +291,17 @@ var chart = lineChart();
 
 
 
-// **************************
-// ** SLIDER AND DROPDOWN  **
-// **************************
+// **********************
+// ** SLIDER AND PLAY  **
+// **********************
 (function () {
 
-    var current = new Date(1744, 10, 3);;
+    var current = new Date(1750, 10, 3);;
     var target = new Date(2013, 10, 3);
     var playButton = d3.select("#play-button");
 
-    var dataTime = d3.range(0, 270).map(function(d) {
-        return new Date(1744 + d, 10, 3);
+    var dataTime = d3.range(0, 264).map(function(d) {
+        return new Date(1750 + d, 10, 3);
     });
 
     var sliderTime = d3
@@ -310,7 +311,7 @@ var chart = lineChart();
         .step(1000 * 60 * 60 * 24 * 365)
         .width(765)
         .tickFormat(d3.timeFormat('%Y'))
-        .default(new Date(1860, 10, 3))
+        .default(new Date(1890, 10, 3))
         .on('onchange', val => {
             current = val;
              d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(val));

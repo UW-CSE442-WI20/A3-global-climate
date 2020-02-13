@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Global Temperature - Write-up</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="icon" type="image/png" href="images/favicon-32x32.png">
+</head>
+
+<body>
+    <div class="container" style="margin-top: 2vh">
+        <div class="row">
+            <div class="twelve columns">
+                <h2 style="text-align: center">Is it getting hot in here?</h2>
+                <h5 style="text-align: center">Global temperature changes</h5>
+                <nav class="navbar">
+                    <div class="container">
+                        <ul class="navbar-list">
+                            <li class="navbar-item"><a class="navbar-link" href="write-up.html">Write-up</a></li>
+                            <li class="navbar-item"><a class="navbar-link" href="index.html">Home</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <div class="row">
+            <h4>About</h4>
+            <p>
+	        Have temperatures around the world risen?
+	        What country has the best vacation weather?
+                Should we be panicking? I'm not panicking. Are you panicking?
+                This visualization is made to answer these questions.
+                The interactive chart and chloropleth of global yearly mean climate data from
+                land observations between 1750 and 2013 (Berkeley climate data) provides a
+                detailed and interactive way to visualize climate data.
+            </p>
+        </div>
+        <div class="row">
+            <h4>Design</h4>
+	    <h5>Chloropleth</h5>
+            <p>
+	       We started wanting to show the average temperatures of countries relative to each other on a year-by-year basis. A chloropleth felt like a natural choice for displaying this data. We chose a two-color gradient instead of a one-color gradient for greater variance between temperature changes, as most per-country changes are relatively small. Our two selected colors are red and blue as they are conventional analogs for warm and cold. For each country, the exact average temperature for the given year is displayed along with the country name when a user hovers over it. This gives a higher degree of granularity, and allows the user to identify countries they are not familiar with. Most countries lack data for some span of years. During these years, a country is painted black. We chose black over a lighter color so as to clearly differentiate it from our color gradient. This has the added benefit of roughly visualizing data coverage over the years.
+	    </p>
+	    <h5>Year Slider</h5>
+            <p>
+	        To adjust the year, we chose to use a slider for its resemblance to a timeline. This timeline extends from 1750 to 2013 because that is the timespan of our dataset. A play button was added to automatically display global average temperature progression as a timelapse. 
+	    </p>
+	    <h5>Temperature Chart</h5>
+            <p>
+	        For a higher degree of granularity, we chose to append a chart to display the average temperature of individual countries over time. A simple line chart was chosen both for simplicity and to clearly display temperature progression at a single glance, something our chloropleth lacks on its own. Due to the variance of average temperature measurement between years, it can be difficult to visualize a direction of temperature progression. For this reason, we overlayed a line for a 5-year moving average. We chose this over a 10- or 20-year moving average so as to not obfuscate major spikes. Since temperature data collection has grown more precise over the last two centuries, we felt it important to include a region of uncertainty around our 5-year moving average data. These uncertainties were provided in our original dataset.  To select the country, we allow the user to select from both a drop-down menu and form the chloropleth itself. We chose to include both methods over one or the other for the user's convenience. The temperature axis, the Y-axis, was allowed to change relative to each country. This is because the range of temperatures varies greatly between countries, and including the full temperature range hid the small 1 to 3 degree increases. The X-axis, for the year, was kept at a constant domain of 1750 to 2013 so as to emphasize the presence or lack of historical data.
+            </p>
+        </div>
+        <div class="row">
+            <h4>Our Team</h4>
+            <ul>
+	        <li><b>Jaclyn Brockschmidt</b> - data preparation</li>
+                <li><b>Lynda Pham</b> - temperature chart</li>
+                <li><b>Peter Vu</b> - dynamic chloropleth</li>
+                <li><b>Zaynah Arif</b> - dropdown menu, slider, and play function</li>
+                <li><b>Jesse Cho</b> <i>(no longer in class)</i> - web design</li>
+            </ul>
+            <p>
+	      We each worked about 20 hours each. <br>
+              <small>*Jesse worked about 10 hours but had to drop due to registration complications.</small>
+            </p>
+            <h5>Contact</h5>
+            <p>
+                Feel free to contact us via Canvas. Report issues and suggestions on the A3-global-climate GitHub page.
+            </p>
+	    <h5>Sources</h5>
+	    <ul>
+	      <li><a href="http://berkeleyearth.org/">Berkeley Earth</a></li>
+	      <li><a href="https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/">Country codes</a></li>
+	    </ul>
+        </div>
+    </div>
+
+    <script>
+        //disabling page refresh on submit
+        (function() {
+            var form = document.getElementById("search-form");
+            form.addEventListener('submit', (evnt) => {evnt.preventDefault();});
+        })();
+    </script>
+</body>
+</html>
