@@ -203,22 +203,6 @@ var map = choropleth();
           .y(function(d) { return y(+d.yr1_temp) })
       )
 
-      svg.append("text")
-          .attr("class", "x label")
-          .attr("text-anchor", "end")
-          .attr("x", width)
-          .attr("y", height - 6)
-          .text("Year");
-
-        svg.append("text")
-        .attr("class", "y label")
-        .attr("text-anchor", "end")
-        .attr("x", 30)
-        .attr("y", 6)
-        .attr("dy", "-3em")
-        .attr("transform", "rotate(-90)")
-        .text("Average Temperature (\xB0C)");
-
     });
 })(); */
 
@@ -256,6 +240,8 @@ var map = choropleth();
         .defined((d) => !isNaN(d.temp))
         .x(function(d) { return x(+d.year) })
         .y(function(d) { return y(+d.temp) });
+    
+    
 
     d3.csv("data/TAVG-by-country/AGO-TAVG.csv", function(error, data) {
         if (error) throw error;
@@ -289,20 +275,25 @@ var map = choropleth();
         svg.append("g")
             .call(d3.axisLeft(y));
 
- /*       svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("Frequenza (tf-idf)"); */
+        svg.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "end")
+          .attr("x", width)
+          .attr("y", height - 6)
+          .text("Year");
+  
+        svg.append("text")
+          .attr("class", "y label")
+          .attr("text-anchor", "end")
+          .attr("y", 6)
+          .attr("dy", "-3em")
+          .attr("transform", "rotate(-90)")
+          .text("Average Temperature (\xB0C)");
+        
+          svg.append("circle").attr("cx",15).attr("cy",10).attr("r", 6).style("fill", "#69b3a2")
+          svg.append("circle").attr("cx",15).attr("cy",30).attr("r", 6).style("fill", "#404080")
+          svg.append("text").attr("x", 25).attr("y", 10).text("1-yr average").style("font-size", "14px").attr("alignment-baseline","middle")
+          svg.append("text").attr("x", 25).attr("y", 30).text("5-yr average").style("font-size", "14px").attr("alignment-baseline","middle")
 
         var temperature = svg.selectAll(".temperature")
             .data(temperatures)
@@ -313,7 +304,10 @@ var map = choropleth();
             .attr("class", function(d) { return "line " + d.period })
             .attr("d", function(d) { return line(d.values); })
             .style("stroke", function(d) { return color(d.period); });
-
+        
+        var filteredData = d.filter(line.defined());
+        d3.select('#gap-line').attr('d', line(filteredData));
+        
         /*temperature.append("text")
             .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
             .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temp) + ")"; })
