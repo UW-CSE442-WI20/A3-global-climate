@@ -94,7 +94,8 @@ function choropleth() {
                 .attr("d", path)
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
-                .on("mouseout", mouseout);
+                .on("mouseout", mouseout)
+                .on("click", (d) => { chart.redraw(d.id) });
     }
 
     // show tooltip and highlight country
@@ -194,7 +195,7 @@ function lineChart() {
             if (error) throw error;
     
             // create color domain from data columns other than year
-            color.domain(d3.keys(data[0]).filter((key) => key == "yr5_temp" && !key.endsWith("_unc")));
+            color.domain(['yr5_temp']);
     
             var temperatures = color.domain().map((col) => {
                 return {
@@ -209,7 +210,7 @@ function lineChart() {
                 };
             });
     
-            x.domain(d3.extent(data, (d) => d.year));
+            x.domain([1750, 2013]);
             
             y.domain([
                 d3.min(temperatures, (c) => d3.min(c.values, (v) => v.temp - v.unc)),
