@@ -90,7 +90,7 @@ function choropleth() {
                     if (!d.years) {
                         d.years = {};
                     }
-                    d.cur_year = 2000;
+                    d.cur_year = 1890;
                     // Set the color
                     return getColor(d.years[d.cur_year]);
                 })
@@ -220,7 +220,7 @@ var map = choropleth();
         .step(1000 * 60 * 60 * 24 * 365)
         .width(765)
         .tickFormat(d3.timeFormat('%Y'))
-        .default(new Date(1860, 10, 3))
+        .default(new Date(1890, 10, 3))
         .on('onchange', val => {
             current = val;
              d3.select('p#value-time').text("Year: "+d3.timeFormat('%Y')(val));
